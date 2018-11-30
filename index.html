@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>FruitsShop</title>
+<style>
+    body {
+        background-color:#F0F0F0;
+        padding: 2em;
+        font-family: 'Raleway','Source Sans Pro', 'Arial';
+    }
+    .container {
+        width: 50%;
+        margin: 0 auto;
+    }
+    label {
+        display:block;
+        margin-bottom:10px;
+    }
+    input {
+        padding:10px;
+        width: 50%;
+        margin-bottom: 1em;
+    }
+    button {
+        margin: 2em 0;
+        padding: 1em 4em;
+        display:block;
+    }
+#balance {
+        padding:1em;
+        background-color:#fff;
+        margin: 1em 0;
+    }
+#status {
+        font-weight:normal;
+        font-family: monospace;
+        padding:1em;
+        background-color:#fff;
+        margin: 1em 0;
+    }
+    </style>
+  </head>
+  <body>
+    <!-- Form -->
+    <div class="container">
+        <h1>FruitsShop</h1>
+        <!-- <h2 id="balance">Current Balance = <span id="count"></span></h2> -->
+        <table>
+            <tr>
+                <th><img src="image/Orange.jpg" alt="Orange" width="150" height="150"></th>
+                <th><img src="image/Banana.jpg" alt="Banana" width="150" height="150"></th>
+                <th><img src="image/apple.jpg" alt="Apple" width="150" height="150"></th>
+                <th><img src="image/watermelon.jpg" alt="Watermelon" width="150" height="150"></th>
+                <th><img src="image/mango.jpg" alt="Mango" width="150" height="150"></th>
+            </tr>
+            <tr>
+                <td><button id="button" style="display: block" onclick="javascript:addFruit(0)">Buy</button></td>
+                <td><button id="button" style="display: block" onclick="javascript:addFruit(1)">Buy</button></td>
+                <td><button id="button" style="display: block" onclick="javascript:addFruit(2)">Buy</button></td>
+                <td><button id="button" style="display: block" onclick="javascript:addFruit(3)">Buy</button></td>
+                <td><button id="button" style="display: block" onclick="javascript:addFruit(4)">Buy</button></td>
+            </tr>
+        </table>
+        <h3 id="balance">Orange = <span id="Ocount" ></span></h3>
+        <h3 id="balance">Banana = <span id="Bcount"></span></h3>
+        <h3 id="balance">Apple = <span id="Acount"></span></h3>
+        <h3 id="balance">Watermelon = <span id="Wcount"></span></h3>
+        <h3 id="balance">Mango = <span id="Mcount"></span></h3>
+        <!-- <button id="button" style="display: block" onclick="javascript:addFruit(4)">BUY</button> -->
+        <hr/>
+        <br/>
+        <label class="col-lg-2 control-label"><strong>Account: <span id="acc"></span></strong></label>
+        <label for="newBalance" class="col-lg-2 control-label"><strong>Balance: <span id="Mybalance"></span></strong></label>
+        <!-- <button id="button" style="display: inline-block" onclick="javascript:setBalance()">Set New Balance</button> -->
+        <br/>
+    </div>
+  </body>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+  <script>
+        document.getElementById("acc").innerText= web3.eth.accounts[0];
+function addFruit(x){
+        const price = [150000000000000000, 500000000000000000, 200000000000000000, 600000000000000000, 300000000000000000]
+        Shop.addFruit(x, {value: price[x]} ,function(errorGet,resultGet){
+        console.log(errorGet,resultGet)
+        if(errorGet){
+            console.log("add failed");
+        }else{
+            Shop.getOwnerFruit(function(err,res){
+                console.log(res[0].toNumber(),err);
+                document.getElementById('Ocount').innerText=res[0];
+                document.getElementById('Bcount').innerText=res[1];
+                document.getElementById('Acount').innerText=res[2];
+                document.getElementById('Wcount').innerText=res[3];
+                document.getElementById('Mcount').innerText=res[4];
+            })
+        }
+    })
+   
+}
+ 
+function getBalance(){
+    Shop.getBalance(function(err,res){
+        document.getElementById('Mybalance').innerText=res;
+    })
+}
+ 
+ 
+ 
+ 
+// Initializing
+    if (typeof web3 !== 'undefined') {
+      web3 = new Web3(web3.currentProvider); // inject from Metamask plugin
+    }
+// Get default address
+    web3.eth.defaultAccount = web3.eth.accounts[0];
+// TODO: Replace your Shop contract address here
+    var contractAddress = '0xe07f8c6445f4a64a913255c6267b108d873535b1';
+// TODO: Replace your Shop abi here
+    var abi = [
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "addFruit",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "success",
+				"type": "bool"
+			}
+		],
+		"name": "Pay",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "fruits",
+		"outputs": [
+			{
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getBalance",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getFruit",
+		"outputs": [
+			{
+				"components": [
+					{
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"name": "price",
+						"type": "uint256"
+					}
+				],
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getOwnerFruit",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+// Create an interface to Shop on TomoChain
+    var ShopContract = web3.eth.contract(abi);
+    var Shop = ShopContract.at(contractAddress);
+    getBalance();
+  </script>
+</html>
